@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>登录</title>
+		<style type="text/css">
+			input{
+				float:right;
+			}
+		</style>
+		<script type="text/javascript" src="../js/jquery-1.11.1.js"></script>
+		<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+		<script type="text/javascript">
+			$(function(){
+				var uid = $.cookie('uid');
+				var status = $.cookie('status');
+				$.ajax({
+					url:"queryOrder.do",
+					type:"post",
+					data:{"uid":uid,"status":status},
+					dataType:"json",
+					success:function(data){
+						if(data.statu==0){
+							if(status==0){
+								for(var i=0;i<data.data.length;i++){
+									$li=$("<span>"+data.data[i].bname+"</span></br><input type='button' value='立即购买'></br><span>"+data.data[i].ordertime+"</span><hr>");
+									$li.data("oid",data.data[i].oid);
+									$("#div").append($li);
+								}
+							}else{
+								for(var i=0;i<data.data.length;i++){
+									$li=$("<span>"+data.data[i].bname+"</span></br></br><span>"+data.data[i].ordertime+"</span><hr>");
+									$("#div").append($li);
+								}
+							}
+						}else{
+							alert(data.msg);
+						}
+					},
+					error:function(){
+						alert("发生异常！");
+					}
+				});
+				$("#div").on("click","input",function(){
+					var oid = $(this).data("oid");
+					$.ajax({
+						url:"modifyOrder.do",
+						type:"post",
+						data:{"oid":oid},
+						dataType:"json",
+						success:function(data){
+							if(data.statu==0){
+								alert("购买成功");
+								location.href="show.html";
+							}else{
+								alert("购买失败");
+							}
+						},
+						error:function(){
+							alert("发生异常！");
+						}
+					});
+				})
+			})
+		</script>
+	</head>
+	<body>
+		<div id="div"></div>
+	</body>
+</html>

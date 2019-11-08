@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>主界面</title>
+<meta charset="UTF-8">
+<style>
+	.div1{
+		width:1348px;
+		height:130px;
+		background: #15B69A;
+		border: 1px solid #000;
+		text-align:center;
+		line-height:70px;
+		font-size:30px;
+	}
+	.div2{
+		width:250px;
+		height:100%;
+		float:left;
+	}
+	span{
+		display:block;
+		text-align:left;
+	}
+	.div3{
+		width:1000px;
+		height:100%;
+		float:right;
+	}
+	ul li{
+	    width:180px;
+		list-style:none;
+		border:1px solid #ccc;
+		background-color:#15B69A;
+		text-align:left;
+	}
+	img{
+		width:200px;
+		height:200px;
+		margin:10px;
+	}
+	#txt{
+		width: 50px;
+		height: 20px;
+	}
+	#div4{
+		position:fixed;
+		top:610px;
+		left:640px;
+	}
+</style>
+<script type="text/javascript" src="../js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript">
+$(function(){
+	var f1 = false;
+	var f2 = false;
+	var cid1;
+	$.ajax({
+		url:"queryFirst.do",
+		type:"post",
+		dataType:"json",
+		success:function(data){
+			if(data.statu==0){
+				for(var i=0;i<data.data.length;i++){
+					$li=$("<li>"+"+ "+data.data[i].cname+"</li></br>");
+					$li.data("cid",data.data[i].cid);
+					$("#ul1").append($li);
+				}
+			}else{
+				alert(data.msg);
+			}
+		},
+		error:function(){
+			alert("发生异常！");
+		}
+	});
+	$("#hh").html("用户："+$.cookie('login')+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	var $b = $("<input type='button' id='btn1' value='我的购物车'><input type='button' id='btn2' value='我的订单'><input type='button' id='btn3' value='修改密码'><input type='button' id='btn4' value='退出'>");
+	$("#hh").append($b);
+	$("#ul1").on("click","li",function(){
+		var content2 = $(this).html();
+		var content = content2.substring(0,1);
+		var content1 = content2.substring(1,content2.length);
+		var cid = $(this).data("cid");
+		if("+"==content){
+			$("#ul2").empty();
+			$.ajax({
+				url:"querySecond.do",
+				type:"post",
+				data:{"cid":cid},
+				dataType:"json",
+				success:function(data){
+					if(data.statu==0){
+						for(var i=0;i<data.data.length;i++){
+							$li=$("<li>"+data.data[i].cname+"</li></br>");
+							$li.data("cid",data.data[i].cid);
+							$("#ul2").append($li);
+						}
+					}else{
+						alert(data.msg);
+					}
+				},
+				error:function(){
+					alert("发生异常！");
+				}
+			});
+			$(this).html("-"+content1);
+		}else{
+			$("#ul2").empty();
+			$(this).html("+"+content1);
+		}
+	})
+$("#ul2").on("click","li",function(){
+	$("#div1 img").remove();
+	var cid = $(this).data("cid");
+	cid1 = $(this).data("cid");
+	f1=true;
+	f2=false;
+	$("#txt").val("1");
+	$.ajax({
+		url:"all.do",
+		type:"post",
+		data:{"cid":cid,"page":"1"},
+		dataType:"json",
+		success:function(data){
+			if(data.statu!=1){
+				for(var i=0;i<data.data.length;i++){
+					var $div = $('<img src="../'+data.data[i].image_b+'">');
+					$div.data("bid",data.data[i].bid);
+					$("#div1").append($div);
+				}
+			}else{
+				alert(data.msg);
+			}
+		},
+		error:function(){
+			alert("发生异常！");
+		}
+	});
+})
+$("#div1").on("click","img",function(){
+	$.cookie('bid',$(this).data("bid"));
+	location.href="detail.html";
+})
+$("#btn4").click(function(){
+	location.href="login.html";
+})
+$("#btn1").click(function(){
+	$.cookie('status','0');
+	location.href="show.html";
+})
+$("#btn2").click(function(){
+	$.cookie('status','1');
+	location.href="show.html";
+})
+$("#btn3").click(function(){
+	location.href="modifypwd.html";
+})
+$("#search").click(function(){
+	f1=false;
+	f2=true;
+	$("#txt").val("1");
+	$("#div1 img").remove();
+	var bname = $("#book").val();
+	$.ajax({
+		url:"search.do",
+		type:"post",
+		data:{"bname":bname,"page":"1"},
+		dataType:"json",
+		success:function(data){
+			if(data.statu!=1){
+				for(var i=0;i<data.data.length;i++){
+					var $div = $('<img src="../'+data.data[i].image_b+'">');
+					$div.data("bid",data.data[i].bid);
+					$("#div1").append($div);
+				}
+			}else{
+				alert(data.msg);
+			}
+		},
+		error:function(){
+			alert("发生异常！");
+		}
+	});
+})
+$("#btn8").click(function(){
+	$("#div1 img").remove();
+	var page = $("#txt").val();
+	if(page!=1){
+		page = eval(page+"-1");
+	}
+	$("#txt").val(page);
+	if(f1){
+		$.ajax({
+			url:"all.do",
+			type:"post",
+			data:{"cid":cid1,"page":page},
+			dataType:"json",
+			success:function(data){
+				if(data.statu!=1){
+					for(var i=0;i<data.data.length;i++){
+						var $div = $('<img src="../'+data.data[i].image_b+'">');
+						$div.data("bid",data.data[i].bid);
+						$("#div1").append($div);
+					}
+				}else{
+					alert(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+	}else if(f2){
+		var bname = $("#book").val();
+		$.ajax({
+			url:"search.do",
+			type:"post",
+			data:{"bname":bname,"page":page},
+			dataType:"json",
+			success:function(data){
+				if(data.statu!=1){
+					for(var i=0;i<data.data.length;i++){
+						var $div = $('<img src="../'+data.data[i].image_b+'">');
+						$div.data("bid",data.data[i].bid);
+						$("#div1").append($div);
+					}
+				}else{
+					alert(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+	}
+})
+$("#btn9").click(function(){
+	$("#div1 img").remove();
+	var page = $("#txt").val();
+	page = eval(page+"+1");
+	if(f1){
+		$.ajax({
+			url:"all.do",
+			type:"post",
+			data:{"cid":cid1,"page":page},
+			dataType:"json",
+			success:function(data){
+				if(data.statu!=1){
+					for(var i=0;i<data.data.length;i++){
+						var $div = $('<img src="../'+data.data[i].image_b+'">');
+						$div.data("bid",data.data[i].bid);
+						$("#div1").append($div);
+					}
+					if(data.statu==0){
+						$("#txt").val(page);
+					}else{
+						$("#txt").val(eval(page+"-1"));
+					}
+				}else{
+					alert(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+	}else if(f2){
+		var bname = $("#book").val();
+		$.ajax({
+			url:"search.do",
+			type:"post",
+			data:{"bname":bname,"page":page},
+			dataType:"json",
+			success:function(data){
+				if(data.statu!=1){
+					for(var i=0;i<data.data.length;i++){
+						var $div = $('<img src="../'+data.data[i].image_b+'">');
+						$div.data("bid",data.data[i].bid);
+						$("#div1").append($div);
+					}
+					if(data.statu==0){
+						$("#txt").val(page);
+					}else{
+						$("#txt").val(eval(page+"-1"));
+					}
+				}else{
+					alert(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+	}
+})
+})
+</script>
+
+</head>
+<body>
+	<div class="div1" id="div">
+		蚌埠学院网上书城系统</br>
+		<span id="hh"></span>
+	</div>
+	<div class="div2">
+		<ul id="ul1"></ul>
+		<ul id="ul2"></ul>
+	</div>
+	<div class="div3" id="div1">	
+		<input type="text" name="bname" id="book"/>
+    	<input type="button" id="search" value="高级搜索"></br></br>
+    	<div id="div4">
+    		<input type="button" id="btn8" value="上一页" />
+    		<input type="text" id="txt" value="1" />
+    		<input type="button" id="btn9" value="下一页"/>
+    	</div>
+	</div>
+</body>
+</html>

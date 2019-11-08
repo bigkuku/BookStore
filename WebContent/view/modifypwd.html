@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>登录</title>
+		<style>
+			body{
+				background: url(img/11.jpg) no-repeat;
+			}
+			.login{
+				width: 600px;
+				height: 400px;
+				margin: 150px auto;
+				border: 1px solid #666;
+				background-color: #AFDCF3;
+			}
+			.main{
+				margin: 20px 0 0 40px ;
+			}
+			.main input[type="text"]{
+				width: 200px;
+				height: 40px;
+			}
+			.main input[type="password"]{
+				width: 200px;
+				height: 40px;
+			}
+			.main input[type="button"]{
+				width: 200px;
+				height: 30px;	
+			}
+		</style>
+<script type="text/javascript" src="../js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script type="text/javascript">
+		function login(){
+			var pwd = $("#pwd").val();
+			var vali = $("#vali").val();
+			if(pwd==vali){
+				$.ajax({
+					url:"updateUser.do",
+					data:{"pwd":pwd,"uid":$.cookie('uid')},
+					type:"post",
+					dataType:"json",
+					success:function(data){
+						if(data.statu==0){
+							$("#msg3").html("");
+							location.href="login.html";
+						}else{
+							$("#msg3").html(data.msg);
+						}
+					},
+					error:function(){
+						alert("发生异常！");
+					}
+				});
+			}else{
+				$("#msg3").html("两次输入的密码不一致，请重新输入");
+			}
+		}
+	</script>
+	<script type="text/javascript">
+		$(function(){
+			$("#login").val($.cookie('login'));
+			$("#login").attr("disabled","disabled");
+			var flag1=false;
+			var flag2=false;
+			$(document).keydown(function(event){
+				   if(event.keyCode == 13){
+					   if(flag1&&flag2){
+						   login();
+					   }
+				   }
+			})
+			$("#btn").click(function(){
+				if(flag1&&flag2){
+					login();
+				}
+			})
+			$("#pwd").blur(function(){
+				var password=$("#pwd").val();
+				if(!/^\w{6,20}$/.test(password)){
+					$("#msg2").html("密码长度必须是6~20位之间");
+					flag2=false;
+				}else{
+					$("#msg2").html("");
+					flag2=true;
+				}
+			})
+			$("#vali").blur(function(){
+				var password=$("#pwd").val();
+				if(!/^\w{6,20}$/.test(password)){
+					$("#msg1").html("密码长度必须是6~20位之间");
+					flag1=false;
+				}else{
+					$("#msg1").html("");
+					flag1=true;
+				}
+			})
+		})
+	</script>
+	</head>
+	<body>
+		<div class="login">
+			<div class="main"><br />
+				<div class="one">
+					账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：<input type="text" name="" id="login" />
+				</div><br />
+				<div class="one">
+					新&nbsp;&nbsp;密&nbsp;&nbsp;码：<input type="password" name="" id="pwd" />
+					<span id="msg2"></span>
+				</div><br />
+				<div class="one">再次输入：<input type="password" id="vali" /><span id="msg1"></span></div></br>
+				<div class="two"><input type="button" name="" id="btn" value="确定" /><span id="msg3"></div>
+			</div>
+		</div>
+	</body>
+</html>

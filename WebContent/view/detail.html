@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>详细信息</title>
+	<style type="text/css">
+		#div1{
+			width:400px;
+			height:500px;
+			margin:50px;
+			display:inline-block;
+		}
+		#div2{
+			width:700px;
+			height:500px;
+			display:inline-block;
+		}
+		img{
+			width:380px;
+			height:480px;
+			margin:10px;
+		}
+		input[type="text"]{
+			width: 50px;
+			height: 20px;
+		}
+		.span{
+			width:160px;
+			height:20px;
+			display:inline-block;
+		}
+	</style>	
+<script type="text/javascript" src="../js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript">
+	$(function(){
+		var bid = $.cookie('bid');
+		$.ajax({
+			url:"searchid.do",
+			type:"post",
+			data:{"bid":bid},
+			dataType:"json",
+			success:function(data){
+				if(data.statu==0){
+					var $div = $('<img src="../'+data.data.image_w+'">');
+					$("#div1").append($div);
+					$("#span1").html("图书名："+data.data.bname);
+					$("#span2").html("优惠价："+data.data.currPrice);
+					$("#span3").html("定价："+data.data.price);
+					$("#span4").html("折扣："+data.data.discount);
+					$("#span5").html("作者："+data.data.author);
+					$("#span6").html("出版社："+data.data.press);
+					$("#span7").html("出版时间："+data.data.publishtime);
+					$("#span8").html("版次："+data.data.edition);
+					$("#span9").html("页数："+data.data.pageNum);
+					$("#span10").html("字数："+data.data.wordNum);
+					$("#span11").html("印刷时间："+data.data.printtime);
+					$("#span12").html("开本："+data.data.booksize);
+					$("#span13").html("纸张："+data.data.paper);
+				}else{
+					alert(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+		$("#btn").click(function(){
+			var uid = $.cookie('uid');
+			var num = $("#num").val();
+			var total = $("#span2").html().substring(4,$("#span2").html().length)*num;
+			var status = 1;
+			var bname = $("#span1").html().substring(4,$("#span1").html().length);
+			$.ajax({
+				url:"saveOrder.do",
+				type:"post",
+				data:{"total":total,"status":status,"bname":bname,"uid":uid},
+				dataType:"json",
+				success:function(data){
+					if(data.statu==0){
+						alert("购买成功，共支付："+total);
+						location.href="main.html";
+					}else{
+						alert(data.msg);
+					}
+				},
+				error:function(){
+					alert("发生异常！");
+				}
+			});
+		})
+		$("#btn1").click(function(){
+			var bname = $("#span1").html().substring(4,$("#span1").html().length);
+			var uid = $.cookie('uid');
+			var num = $("#num").val();
+			var status = 0;
+			var total = $("#span2").html().substring(4,$("#span2").html().length)*num;
+			$.ajax({
+				url:"saveOrder.do",
+				type:"post",
+				data:{"total":total,"status":status,"bname":bname,"uid":uid},
+				dataType:"json",
+				success:function(data){
+					if(data.statu==0){
+						alert("成功加入购物车");
+						location.href="main.html";
+					}else{
+						alert(data.msg);
+					}
+				},
+				error:function(){
+					alert("发生异常！");
+				}
+			});
+		})
+	})
+</script>
+	
+	</head>
+	<body>
+		<div id="div1"></div>
+		<div id="div2">
+			<span id="span1">图书名</span></br></br>
+			<span id="span2">优惠价</span></br></br>
+			<span id="span3">定价</span>
+			<span id="span4">折扣</span></br></br>
+			<hr>
+			<span id="span5">作者</span></br></br>
+			<span id="span6">出版社</span></br></br>
+			<span id="span7">出版时间</span></br></br>
+			<span class="span" id="span8">版次</span>
+			<span class="span" id="span9">页数</span>
+			<span class="span" id="span10">字数</span></br></br>
+			<span class="span" id="span11">印刷时间</span>
+			<span class="span" id="span12">开本</span>
+			<span class="span" id="span13">纸张</span></br></br>
+			</br>
+			我要买：<input type="text" value="1" id="num"/>本
+			</br></br>
+			<input type="button" id="btn" value="购买">
+			<input type="button" id="btn1" value="加入购物车">
+		</div>
+	</body>
+</html>

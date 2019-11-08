@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>登录</title>
+		<style>
+			body{
+				background: url(img/11.jpg) no-repeat;
+			}
+			.login{
+				width: 600px;
+				height: 400px;
+				margin: 150px auto;
+				border: 1px solid #666;
+				background-color: #AFDCF3;
+			}
+			.main{
+				margin: 20px 0 0 40px ;
+			}
+			.main input[type="text"]{
+				width: 200px;
+				height: 40px;
+			}
+			.main input[type="password"]{
+				width: 200px;
+				height: 40px;
+			}
+			.main input[type="button"]{
+				width: 200px;
+				height: 30px;
+				
+			}
+			#v1,#v2{
+				width: 100px;
+				height: 40px;
+			}
+			#btn1{
+				width: 80px;
+				height: 30px;
+			}
+		</style>
+<script type="text/javascript" src="../js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript">
+	function login(){
+		var login = $("#login").val();
+		var pwd = $("#pwd").val();
+		$.ajax({
+			url:"login.do",
+			data:{"login":login,"pwd":pwd},
+			type:"post",
+			dataType:"json",
+			success:function(data){
+				if(data.statu==0){
+					$.cookie('login',data.data.login);
+					$.cookie('uid',data.data.uid);
+					$("#msg3").html("");
+					location.href="main.html";
+				}else{
+					$("#msg3").html(data.msg);
+				}
+			},
+			error:function(){
+				alert("发生异常！");
+			}
+		});
+	}
+</script>
+<script type="text/javascript">
+	$(function(){
+		
+		var flag1=false;
+		var flag2=false;
+		$(document).keydown(function(event){
+			   if(event.keyCode == 13){
+				   if(flag1&&flag2){
+					   login();
+				   }
+			   }
+		})
+		$("#btn2").click(function(){
+			if(flag1&&flag2){
+				login();
+			}
+		})
+		$("#login").blur(function(){
+			var loginname = $("#login").val();
+			if(!/^\w{6,20}$/.test(loginname)){
+				$("#msg1").html("登录名长度必须是6~20位之间");
+				flag1=false;
+			}else{
+				$("#msg1").html("");
+				flag1=true;
+			}
+		})
+		$("#pwd").blur(function(){
+			var password=$("#pwd").val();
+			if(!/^\w{6,20}$/.test(password)){
+				$("#msg2").html("密码长度必须是6~20位之间");
+				flag2=false;
+			}else{
+				$("#msg2").html("");
+				flag2=true;
+			}
+		})
+		$("#btn3").click(function(){
+			location.href="register.html";
+		})
+	})	
+		
+</script>
+	
+	</head>
+	<body>
+		<div class="login">
+			<div class="main"><br />
+				<div class="one">
+					账&nbsp;&nbsp;&nbsp;&nbsp;号：<input type="text" name="" id="login" />
+					<span id="msg1"></span>
+				</div><br />
+				<div class="one">
+					密&nbsp;&nbsp;&nbsp;&nbsp;码：<input type="password" name="" id="pwd" />
+					<span id="msg2"></span>
+				</div><br />
+				<div class="two"><input type="button" name="" id="btn2" value="登录" /><span id="msg3"></span></div><br />
+				<div class="two"><input type="button" name="" id="btn3" value="注册" /></div>
+			</div>
+		</div>
+	</body>
+</html>
